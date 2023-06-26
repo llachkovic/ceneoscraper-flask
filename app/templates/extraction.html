@@ -1,0 +1,21 @@
+{% extends "base.html" %} {% block content %}
+<h1>Extraction</h1>
+{% with messages = get_flashed_messages() %} {% if messages %}
+<div class="alert alert-info">
+  {% for message in messages %}
+  <p>{{ message }}</p>
+  {% endfor %}
+</div>
+{% endif %} {% endwith %}
+<form method="POST">
+  {{ form.hidden_tag() }}
+  <div class="form-group">
+    {{ form.code.label }} {{ form.code(class="form-control") }} {% for error in
+    form.code.errors %}
+    <span class="text-danger">{{ error }}</span>
+    {% endfor %}
+  </div>
+  {{ form.submit(class="btn btn-primary") }}
+</form>
+<a href="{{ url_for('main.index') }}">Back to Index</a>
+{% endblock %}

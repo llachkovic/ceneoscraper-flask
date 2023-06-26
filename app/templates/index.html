@@ -1,0 +1,12 @@
+{% extends "base.html" %} {% block content %}
+<h1>CeneoScraper</h1>
+<p>
+  Hello {{user.username}}! <br />
+  <a href="{{ url_for('main.logout')}}">Log out</a>
+</p>
+<p>Menu:</p>
+<ul>
+  <li><a href="{{ url_for('main.extraction') }}">Extraction</a></li>
+  <li><a href="{{ url_for('main.products') }}">Your Products</a></li>
+</ul>
+{% endblock %}

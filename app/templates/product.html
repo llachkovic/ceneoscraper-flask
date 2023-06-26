@@ -1,0 +1,98 @@
+{% extends "base.html" %} {% block content %}
+<h1>{{ code }}</h1>
+
+<style>
+  table {
+    border-collapse: collapse;
+  }
+
+  th,
+  td {
+    border: 1px solid black;
+    padding: 8px;
+  }
+</style>
+
+<form method="GET" action="{{ url_for('main.product_page', code=code) }}">
+  <label for="id-filter">ID Filter:</label>
+  <input
+    type="number"
+    name="id"
+    id="id-filter"
+    value="{{ request.args.get('id', '') }}"
+  />
+  <label for="pros-filter">Pros contain:</label>
+  <input
+    type="text"
+    name="pros"
+    id="pros-filter"
+    value="{{ request.args.get('pros', '') }}"
+  />
+  <label for="cons-filter">Cons contain:</label>
+  <input
+    type="text"
+    name="cons"
+    id="cons-filter"
+    value="{{ request.args.get('cons', '') }}"
+  />
+  <div>
+    <p>Recommendation:</p>
+    <label for="recommendation_true">True:</label>
+    <input type="checkbox" name="rcm_true" id="recommendation_true" {% if
+    request.args.get('rcm_true') %}checked{% endif %}>
+    <label for="recommendation_false">False:</label>
+    <input type="checkbox" name="rcm_false" id="recommendation_false" {% if
+    request.args.get('rcm_false') %}checked{% endif %}>
+  </div>
+  <div>
+    <p>Stars:</p>
+    <label for="stars_min">Min Stars:</label>
+    <input
+      type="range"
+      name="stars_min"
+      id="stars_min"
+      min="0.5"
+      max="5.0"
+      step="0.5"
+      value="{{ request.args.get('stars_min', 0.5) }}"
+    />
+  </div>
+  <div>
+    <label for="stars_max">Max Stars:</label>
+    <input
+      type="range"
+      name="stars_max"
+      id="stars_max"
+      min="0.5"
+      max="5.0"
+      step="0.5"
+      value="{{ request.args.get('stars_max', 5.0) }}"
+    />
+  </div>
+  <button type="submit">Apply</button>
+</form>
+<a href="{{ url_for('main.product_page', code=code) }}">Reset all filters</a>
+<a href="{{ url_for('main.download_product', code=code) }}">Download .json</a>
+<a href="{{ url_for('main.product_charts', code=code) }}">View Charts</a>
+
+<table>
+  <tr>
+    <th>ID</th>
+    <th>Recommendation</th>
+    <th>Stars</th>
+    <th>Pros</th>
+    <th>Cons</th>
+  </tr>
+  {% for review in reviews %}
+  <tr>
+    <td>{{ review.id }}</td>
+    <td>{{ review.recommendation }}</td>
+    <td>{{ review.stars }}</td>
+    <td>{{ review.pros }}</td>
+    <td>{{ review.cons }}</td>
+  </tr>
+  {% endfor %}
+</table>
+
+<a href="{{ url_for('main.products') }}">Back to list of products</a>
+{% endblock %}

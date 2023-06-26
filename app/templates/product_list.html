@@ -1,0 +1,22 @@
+{% extends "base.html" %} {% block content %}
+<h1>Your Products</h1>
+{% for product in data %}
+<p>
+  ID:<a href="{{ url_for('main.product_page', code=product['id']) }}"
+    >{{product['id']}}</a
+  >
+  <br />
+  Number of opinions: {{product['opinion_count']}} <br />
+  Average stars: {{product['average_stars']}} <br />
+  Number of pros: {{product['pros_count']}} <br />
+  Number of cons: {{product['cons_count']}} <br />
+  <a href="{{ url_for('main.download_product', code=product['id']) }}"
+    >Download .json</a
+  >
+  <a href="{{ url_for('main.product_charts', code=product['id']) }}"
+    >View Charts</a
+  >
+</p>
+{% endfor %}
+<a href="{{ url_for('main.index') }}">Back to main page</a>
+{% endblock %}
