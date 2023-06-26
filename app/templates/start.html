@@ -1,4 +1,4 @@
 {% extends "base_logout.html" %} {% block content %}
 <h1>CeneoScraper</h1>
 <a href="{{ url_for('main.login') }}">Log in to start using the app</a>
-{% endblock %}
+{% include 'description.html' %} {% endblock %}

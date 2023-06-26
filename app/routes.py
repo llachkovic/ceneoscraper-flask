@@ -12,7 +12,6 @@ from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy import func, and_
 import json
-import base64
 
 from app.forms import RegisterForm, LoginForm, ExtractionForm
 from app.models import User, Product, Opinion, db, user_product_association
