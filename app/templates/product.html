@@ -1,52 +1,47 @@
 {% extends "base.html" %} {% block content %}
-<h1>{{ code }}</h1>
+<h1 class="text-4xl font-bold">{{ code }}</h1>
 
-<style>
-  table {
-    border-collapse: collapse;
-  }
-
-  th,
-  td {
-    border: 1px solid black;
-    padding: 8px;
-  }
-</style>
-
-<form method="GET" action="{{ url_for('main.product_page', code=code) }}">
-  <label for="id-filter">ID Filter:</label>
+<form
+  method="GET"
+  action="{{ url_for('main.product_page', code=code) }}"
+  class="mb-4"
+>
+  <label for="id-filter" class="mr-2">ID Filter:</label>
   <input
     type="number"
     name="id"
     id="id-filter"
     value="{{ request.args.get('id', '') }}"
+    class="form-input"
   />
-  <label for="pros-filter">Pros contain:</label>
+  <label for="pros-filter" class="mr-2">Pros contain:</label>
   <input
     type="text"
     name="pros"
     id="pros-filter"
     value="{{ request.args.get('pros', '') }}"
+    class="form-input"
   />
-  <label for="cons-filter">Cons contain:</label>
+  <label for="cons-filter" class="mr-2">Cons contain:</label>
   <input
     type="text"
     name="cons"
     id="cons-filter"
     value="{{ request.args.get('cons', '') }}"
+    class="form-input"
   />
-  <div>
+  <div class="mb-2">
     <p>Recommendation:</p>
-    <label for="recommendation_true">True:</label>
+    <label for="recommendation_true" class="mr-2">True:</label>
     <input type="checkbox" name="rcm_true" id="recommendation_true" {% if
-    request.args.get('rcm_true') %}checked{% endif %}>
-    <label for="recommendation_false">False:</label>
+    request.args.get('rcm_true') %}checked{% endif %} class="mr-2">
+    <label for="recommendation_false" class="mr-2">False:</label>
     <input type="checkbox" name="rcm_false" id="recommendation_false" {% if
-    request.args.get('rcm_false') %}checked{% endif %}>
+    request.args.get('rcm_false') %}checked{% endif %} class="mr-2">
   </div>
-  <div>
+  <div class="mb-2">
     <p>Stars:</p>
-    <label for="stars_min">Min Stars:</label>
+    <label for="stars_min" class="mr-2">Min Stars:</label>
     <input
       type="range"
       name="stars_min"
@@ -55,10 +50,9 @@
       max="5.0"
       step="0.5"
       value="{{ request.args.get('stars_min', 0.5) }}"
+      class="mr-2"
     />
-  </div>
-  <div>
-    <label for="stars_max">Max Stars:</label>
+    <label for="stars_max" class="mr-2">Max Stars:</label>
     <input
       type="range"
       name="stars_max"
@@ -67,29 +61,41 @@
       max="5.0"
       step="0.5"
       value="{{ request.args.get('stars_max', 5.0) }}"
+      class="mr-2"
     />
   </div>
-  <button type="submit">Apply</button>
+  <button
+    type="submit"
+    class="btn btn-primary bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-md"
+  >
+    Apply
+  </button>
 </form>
-<a href="{{ url_for('main.product_page', code=code) }}">Reset all filters</a>
-<a href="{{ url_for('main.download_product', code=code) }}">Download .json</a>
+<a href="{{ url_for('main.product_page', code=code) }}" class="mr-4"
+  >Reset all filters</a
+>
+<a href="{{ url_for('main.download_product', code=code) }}" class="mr-4"
+  >Download .json</a
+>
 <a href="{{ url_for('main.product_charts', code=code) }}">View Charts</a>
 
-<table>
-  <tr>
-    <th>ID</th>
-    <th>Recommendation</th>
-    <th>Stars</th>
-    <th>Pros</th>
-    <th>Cons</th>
+<table class="border border-collapse">
+  <tr class="bg-gray-200">
+    <th class="border border-gray-400 px-4 py-2">ID</th>
+    <th class="border border-gray-400 px-4 py-2">Recommendation</th>
+    <th class="border border-gray-400 px-4 py-2">Stars</th>
+    <th class="border border-gray-400 px-4 py-2">Pros</th>
+    <th class="border border-gray-400 px-4 py-2">Cons</th>
   </tr>
   {% for review in reviews %}
   <tr>
-    <td>{{ review.id }}</td>
-    <td>{{ review.recommendation }}</td>
-    <td>{{ review.stars }}</td>
-    <td>{{ review.pros }}</td>
-    <td>{{ review.cons }}</td>
+    <td class="border border-gray-400 px-4 py-2">{{ review.id }}</td>
+    <td class="border border-gray-400 px-4 py-2">
+      {{ review.recommendation }}
+    </td>
+    <td class="border border-gray-400 px-4 py-2">{{ review.stars }}</td>
+    <td class="border border-gray-400 px-4 py-2">{{ review.pros }}</td>
+    <td class="border border-gray-400 px-4 py-2">{{ review.cons }}</td>
   </tr>
   {% endfor %}
 </table>

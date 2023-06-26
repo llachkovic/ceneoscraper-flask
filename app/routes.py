@@ -89,7 +89,6 @@ def extraction():
     extraction_form = ExtractionForm()
     if extraction_form.validate_on_submit():
         try:
-            flash("Extraction in process")
             product_id = extraction_form.code.data
             reviews = scrape_product_reviews(product_id)
             generate_plots(reviews, product_id)

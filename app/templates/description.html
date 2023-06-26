@@ -1,19 +1,20 @@
-<h2>Description of the project</h2>
-<p>
+<h2 class="text-2xl font-bold mb-4">Description of the project</h2>
+<p class="text-gray-600">
   This is the final version of the semester project from the Computer
   Programming 2 subject - CeneoScraper. The core functionality of this app is a
   web scraper implemented using the bs4 library, used to scrape product reviews
-  from the Polish website <a href="http://www.ceneo.pl">ceneo.pl</a>, summarize
+  from the Polish website
+  <a href="http://www.ceneo.pl" class="text-blue-500">ceneo.pl</a>, summarize
   and analyze this data with charts, which is accomplished using pandas/numpy.
-  In this final version, the funcionality is encapsulated in a Flask web
-  application, providing a more user friendly UI to access the functionality. On
+  In this final version, the functionality is encapsulated in a Flask web
+  application, providing a more user-friendly UI to access the functionality. On
   top, the app has been hooked with functional user accounts, and logging in is
   necessary to use the app. Each user has access only to their own data, and
-  user passwords are of course stored as hashes only. App data is persistent
+  user passwords are, of course, stored as hashes only. App data is persistent
   thanks to the use of an SQLite database, and SQLAlchemy has been used as an
   ORM to model the relational schema and to interact with the database.
 </p>
-<p>
+<p class="text-gray-600">
   To use the application, first register and log in. Once inside, navigate to
   the extraction page, and enter a ceneo product code into the input field.
   After a while, the extraction will be complete and you will be redirected to
@@ -22,8 +23,8 @@
   and view the generated charts for the product. On the Your Products page, you
   can find all products you have previously extracted using your account.
 </p>
-<h2>Used libraries</h2>
-<ul>
+<h2 class="text-2xl font-bold mt-8">Used libraries</h2>
+<ul class="list-disc list-inside text-gray-600">
   <li>BeautifulSoup4</li>
   <li>Flask</li>
   <li>Flask-Login</li>
@@ -32,8 +33,8 @@
   <li>Pandas</li>
   <li>Matplotlib</li>
 </ul>
-<h2>About the Author</h2>
-<p>
+<h2 class="text-2xl font-bold mt-8">About the Author</h2>
+<p class="text-gray-600">
   I am a 2nd year business informatics student at the University of Economics in
   Bratislava. I am passionate about web development across the full stack.
   Fluent in Python and JavaScript.
