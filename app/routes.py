@@ -93,12 +93,8 @@ def extraction():
             flash("Extraction in process")
             product_id = extraction_form.code.data
             reviews = scrape_product_reviews(product_id)
-            plots = generate_plots(reviews)
-            product = Product(
-                id=product_id,
-                stars_plot=plots["stars"],
-                rcmds_plot=plots["recommendations"],
-            )
+            generate_plots(reviews, product_id)
+            product = Product(id=product_id)
             db.session.merge(product)
             for review in reviews:
                 opinion = Opinion(
@@ -268,11 +264,4 @@ def product_charts(code):
     ):
         abort(403)
 
-    stars_bin = base64.b64encode(product.stars_plot).decode("utf-8")
-    rcmds_bin = base64.b64encode(product.rcmds_plot).decode("utf-8")
-    return render_template(
-        "product_charts.html",
-        stars=stars_bin,
-        recommendations=rcmds_bin,
-        product_id=code,
-    )
+    return render_template("product_charts.html", product_id=code)

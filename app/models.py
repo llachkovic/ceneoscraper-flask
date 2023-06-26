@@ -26,8 +26,6 @@ class User(db.Model, UserMixin):
 
 class Product(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    stars_plot = db.Column(db.LargeBinary)
-    rcmds_plot = db.Column(db.LargeBinary)
     opinions = db.relationship(
         "Opinion",
         backref="product",

@@ -3,3 +3,4 @@ class Config:
     SQLALCHEMY_DATABASE_URI = "sqlite:///mydb.db"
     DEBUG = True
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    MATPLOTLIB_BACKEND = "Agg"

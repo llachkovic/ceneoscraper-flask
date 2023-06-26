@@ -1,10 +1,13 @@
+import os
 import pandas as pd
 import numpy as np
-from matplotlib import pyplot as plt
-from io import BytesIO
+import matplotlib
+
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
 
 
-def generate_plots(opinions):
+def generate_plots(opinions, product_code):
     opinions = pd.DataFrame(opinions)
 
     plt.figure(figsize=(10, 6))
@@ -23,8 +26,10 @@ def generate_plots(opinions):
     plt.ylabel("Number of opinions")
     plt.title("Stars Frequency")
 
-    stars_image = BytesIO()
-    plt.savefig(stars_image, format="png")
+    # Save stars plot as a file
+    stars_filename = f"app/static/images/{product_code}_stars.png"
+    os.makedirs(os.path.dirname(stars_filename), exist_ok=True)
+    plt.savefig(stars_filename)
     plt.close()
 
     recommendations = opinions.recommendation.value_counts(dropna=False).reindex(
@@ -38,13 +43,9 @@ def generate_plots(opinions):
     )
     plt.title("Recommendations")
 
-    recommendations_image = BytesIO()
-    plt.savefig(recommendations_image, format="png")
+    # Save recommendations plot as a file
+    recommendations_filename = f"app/static/images/{product_code}_rcmds.png"
+    plt.savefig(recommendations_filename)
     plt.close()
 
-    plots = {
-        "stars": stars_image.getvalue(),
-        "recommendations": recommendations_image.getvalue(),
-    }
-
-    return plots
+    return stars_filename, recommendations_filename

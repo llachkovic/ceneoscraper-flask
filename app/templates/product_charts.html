@@ -1,10 +1,15 @@
 {% extends "base.html" %} {% block content %}
 <h1>Charts for Product {{product_id}}</h1>
-<img src="data:image/png;base64,{{ stars|safe }}" alt="Dynamic Image" />
 <img
-  src="data:image/png;base64,{{ recommendations|safe }}"
-  alt="Dynamic Image"
+  src="{{ url_for('static', filename='images/' + product_id|string + '_stars.png') }}"
+  alt="Stars"
 />
+
+<img
+  src="{{ url_for('static', filename='images/' + product_id|string + '_rcmds.png') }}"
+  alt="Recommendations"
+/>
+
 <a href="{{url_for('main.product_page', code=product_id)}}"
   >Back to product page</a
 >
