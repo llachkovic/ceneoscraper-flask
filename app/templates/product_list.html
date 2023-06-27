@@ -1,30 +1,36 @@
 {% extends "base.html" %} {% block content %}
-<h1 class="text-4xl font-bold">Your Products</h1>
-{% for product in data %}
-<p class="mb-4">
-  ID:
-  <a
-    href="{{ url_for('main.product_page', code=product['id']) }}"
-    class="text-blue-500 hover:underline"
-    >{{ product['id'] }}</a
-  ><br />
-  Number of opinions: {{ product['opinion_count'] }} <br />
-  Average stars: {{ product['average_stars'] }} <br />
-  Number of pros: {{ product['pros_count'] }} <br />
-  Number of cons: {{ product['cons_count'] }} <br />
-  <a
-    href="{{ url_for('main.download_product', code=product['id']) }}"
-    class="mr-4 text-blue-500 hover:underline"
-    >Download .json</a
+<div class="mx-4">
+  <h1 class="text-4xl font-bold my-4">Your Products</h1>
+  {% for product in data %}
+  <p class="mb-4">
+    <span class="font-bold">
+      ID:
+      <a
+        href="{{ url_for('main.product_page', code=product['id']) }}"
+        class="text-blue-500 hover:underline"
+        >{{ product['id'] }}</a
+      >
+    </span>
+    <br />
+    Number of opinions: {{ product['opinion_count'] }} <br />
+    Average stars: {{ product['average_stars'] }} <br />
+    Number of pros: {{ product['pros_count'] }} <br />
+    Number of cons: {{ product['cons_count'] }} <br />
+    <a
+      href="{{ url_for('main.download_product', code=product['id']) }}"
+      class="mr-4 text-blue-500 hover:underline"
+      >Download .json</a
+    >
+    <a
+      href="{{ url_for('main.product_charts', code=product['id']) }}"
+      class="mr-4 text-blue-500 hover:underline"
+      >View Charts</a
+    >
+  </p>
+  {% endfor %}
+  <a href="{{ url_for('main.index') }}" class="text-blue-500 hover:underline"
+    >Back to main page</a
   >
-  <a
-    href="{{ url_for('main.product_charts', code=product['id']) }}"
-    class="mr-4 text-blue-500 hover:underline"
-    >View Charts</a
-  >
-</p>
-{% endfor %}
-<a href="{{ url_for('main.index') }}" class="text-blue-500 hover:underline"
-  >Back to main page</a
->
+</div>
+
 {% endblock %}

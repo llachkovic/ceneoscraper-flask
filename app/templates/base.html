@@ -13,14 +13,26 @@
   </head>
   <body>
     <nav class="bg-gray-800 py-4">
-      <a href="{{url_for('main.index')}}" class="text-white mx-2">Index</a>
-      <a href="{{url_for('main.extraction')}}" class="text-white mx-2"
+      <a
+        href="{{url_for('main.index')}}"
+        class="text-white mx-2 ml-4 hover:text-blue-500"
+        >Index</a
+      >
+      <a
+        href="{{url_for('main.extraction')}}"
+        class="text-white mx-2 hover:text-blue-500"
         >Extraction</a
       >
-      <a href="{{url_for('main.products')}}" class="text-white mx-2"
+      <a
+        href="{{url_for('main.products')}}"
+        class="text-white mx-2 hover:text-blue-500"
         >Your Products</a
       >
-      <a href="{{url_for('main.logout')}}" class="text-white mx-2">Logout</a>
+      <a
+        href="{{url_for('main.logout')}}"
+        class="text-white mx-2 hover:text-red-500"
+        >Logout</a
+      >
     </nav>
     <div class="container mx-auto">{% block content %}{% endblock %}</div>
   </body>
