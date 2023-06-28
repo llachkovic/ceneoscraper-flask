@@ -10,17 +10,19 @@ from flask import (
 )
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
-from sqlalchemy import func, and_
+from sqlalchemy import func
 import json
 
 from app.forms import RegisterForm, LoginForm, ExtractionForm
 from app.models import User, Product, Opinion, db, user_product_association
 from app.util.ceneo_scraper import scrape_product_reviews
 from app.util.analyzer import generate_plots
+from app.util.utils import is_user_associated_with_product
 
 main_blueprint = Blueprint("main", __name__)
 
 
+# Home page
 @main_blueprint.route("/")
 def index():
     if current_user.is_authenticated:
@@ -28,6 +30,7 @@ def index():
     return render_template("start.html")
 
 
+# User registration
 @main_blueprint.route("/register", methods=["GET", "POST"])
 def register():
     register_form = RegisterForm()
@@ -38,6 +41,7 @@ def register():
             password = register_form.password.data
             username = register_form.username.data
 
+            # Create a new user and store it in the database
             new_user = User(
                 username=username,
                 email=email,
@@ -46,17 +50,16 @@ def register():
             db.session.add(new_user)
             db.session.commit()
 
-            print(new_user)
-
             flash("Account successfully created")
             return redirect(url_for("main.login"))
 
-        except Exception:
-            flash(Exception)
+        except Exception as e:
+            flash(str(e))
 
     return render_template("register.html", form=register_form)
 
 
+# User login
 @main_blueprint.route("/login", methods=["GET", "POST"])
 def login():
     login_form = LoginForm()
@@ -64,18 +67,21 @@ def login():
     if login_form.validate_on_submit():
         try:
             user = User.query.filter_by(email=login_form.email.data).first()
-            if check_password_hash(user.password_hash, login_form.password.data):
+            if user and check_password_hash(
+                user.password_hash, login_form.password.data
+            ):
                 login_user(user)
                 return redirect(url_for("main.index"))
             else:
                 flash("Invalid username or password")
 
-        except Exception:
-            flash(Exception)
+        except Exception as e:
+            flash(str(e))
 
     return render_template("login.html", form=login_form)
 
 
+# User logout
 @main_blueprint.route("/logout")
 @login_required
 def logout():
@@ -83,6 +89,7 @@ def logout():
     return redirect(url_for("main.login"))
 
 
+# Data extraction page
 @main_blueprint.route("/extraction", methods=["GET", "POST"])
 @login_required
 def extraction():
@@ -90,10 +97,18 @@ def extraction():
     if extraction_form.validate_on_submit():
         try:
             product_id = extraction_form.code.data
+
+            # Scrape product reviews
             reviews = scrape_product_reviews(product_id)
+
+            # Generate plots
             generate_plots(reviews, product_id)
+
+            # Create a new product or update existing product
             product = Product(id=product_id)
             db.session.merge(product)
+
+            # Save scraped reviews to the database
             for review in reviews:
                 opinion = Opinion(
                     id=review["id"],
@@ -105,12 +120,15 @@ def extraction():
                 )
                 db.session.merge(opinion)
 
+            # Associate the product with the current user
             association = user_product_association.insert().values(
                 user_id=current_user.id, product_id=product_id
             )
             db.session.execute(association)
+
             db.session.commit()
             return redirect(url_for("main.product_page", code=product_id))
+
         except Exception as e:
             flash(f"An error occurred: {str(e)}")
             db.session.rollback()
@@ -118,33 +136,32 @@ def extraction():
     return render_template("extraction.html", form=extraction_form)
 
 
+# Product page
 @main_blueprint.route("/products/<int:code>")
 @login_required
 def product_page(code):
     product = Product.query.get(code)
     if not product:
         abort(404)
-    if (
-        db.session.query(user_product_association)
-        .filter(
-            user_product_association.c.user_id == current_user.id,
-            user_product_association.c.product_id == code,
-        )
-        .count()
-        == 0
-    ):
+
+    # Check if the current user is associated with the product
+    if not is_user_associated_with_product(current_user.id, code):
         abort(403)
-    id_filter = request.args.get("id", "")
-    pros_filter = request.args.get("pros", "")
-    cons_filter = request.args.get("cons", "")
+
+    # Filter reviews based on query parameters
+    filters = {
+        "id": request.args.get("id", ""),
+        "pros": request.args.get("pros", ""),
+        "cons": request.args.get("cons", ""),
+    }
     rcm_true = request.args.get("rcm_true")
     rcm_false = request.args.get("rcm_false")
     stars_min = request.args.get("stars_min")
     stars_max = request.args.get("stars_max")
 
-    query = product.opinions.filter(Opinion.id.ilike(f"%{id_filter}%"))
-    query = query.filter(Opinion.pros.ilike(f"%{pros_filter}%"))
-    query = query.filter(Opinion.cons.ilike(f"%{cons_filter}%"))
+    query = product.opinions.filter(Opinion.id.ilike(f"%{filters['id']}%"))
+    query = query.filter(Opinion.pros.ilike(f"%{filters['pros']}%"))
+    query = query.filter(Opinion.cons.ilike(f"%{filters['cons']}%"))
 
     if rcm_true and rcm_false:
         pass
@@ -153,19 +170,16 @@ def product_page(code):
     elif rcm_false:
         query = query.filter(Opinion.recommendation == False)
 
-    if stars_min and stars_max:
-        query = query.filter(
-            and_(Opinion.stars >= float(stars_min), Opinion.stars <= float(stars_max))
-        )
-    elif stars_min:
+    if stars_min:
         query = query.filter(Opinion.stars >= float(stars_min))
-    elif stars_max:
+    if stars_max:
         query = query.filter(Opinion.stars <= float(stars_max))
 
     product_reviews = query.all()
     return render_template("product.html", reviews=product_reviews, code=code)
 
 
+# List of products associated with the current user
 @main_blueprint.route("/products")
 @login_required
 def products():
@@ -179,14 +193,13 @@ def products():
     products_data = []
     for product in products:
         opinion_count = product.opinions.count()
-        average_stars = product.opinions.with_entities(func.avg(Opinion.stars)).scalar()
-        average_stars = round(average_stars, 2)
-        pros_count = product.opinions.with_entities(
-            func.count(func.nullif(Opinion.pros, ""))
-        ).scalar()
-        cons_count = product.opinions.with_entities(
-            func.count(func.nullif(Opinion.cons, ""))
-        ).scalar()
+        average_stars = round(
+            product.opinions.with_entities(func.avg(Opinion.stars)).scalar(), 2
+        )
+        pros_count, cons_count = product.opinions.with_entities(
+            func.count(func.nullif(Opinion.pros, "")),
+            func.count(func.nullif(Opinion.cons, "")),
+        ).first()
 
         product_data = {
             "id": product.id,
@@ -201,6 +214,7 @@ def products():
     return render_template("product_list.html", data=products_data)
 
 
+# Download product reviews as JSON
 @main_blueprint.route("/products/<int:code>/download")
 @login_required
 def download_product(code):
@@ -209,15 +223,8 @@ def download_product(code):
     if not product:
         abort(404)
 
-    if (
-        db.session.query(user_product_association)
-        .filter(
-            user_product_association.c.user_id == current_user.id,
-            user_product_association.c.product_id == code,
-        )
-        .count()
-        == 0
-    ):
+    # Check if the current user is associated with the product
+    if not is_user_associated_with_product(current_user.id, code):
         abort(403)
 
     product_reviews = product.opinions.all()
@@ -243,6 +250,7 @@ def download_product(code):
     return response
 
 
+# Product charts page
 @main_blueprint.route("/products/<int:code>/charts")
 @login_required
 def product_charts(code):
@@ -251,15 +259,8 @@ def product_charts(code):
     if not product:
         abort(404)
 
-    if (
-        db.session.query(user_product_association)
-        .filter(
-            user_product_association.c.user_id == current_user.id,
-            user_product_association.c.product_id == code,
-        )
-        .count()
-        == 0
-    ):
+    # Check if the current user is associated with the product
+    if not is_user_associated_with_product(current_user.id, code):
         abort(403)
 
     return render_template("product_charts.html", product_id=code)
